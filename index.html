@@ -554,17 +554,25 @@
       top: calc(100% + 5px);
       left: 50%;
       pointer-events: none;
-      transition: left 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: left 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  opacity 0.22s ease,
+                  transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
       z-index: 10;
       display: flex;
       flex-direction: column;
       align-items: center;
+      opacity: 0;
+      transform: scale(0.7) translateY(-6px);
+    }
+    #navLinksPill:hover #navMascot {
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
     /* Face circle */
     #mascotFace {
       width: 40px;
       height: 40px;
-      background: #fffbf0;
+      background: #FFD93D;
       border-radius: 50%;
       position: relative;
       box-shadow: 0 3px 14px rgba(0,0,0,0.40);
@@ -635,7 +643,7 @@
       height: 0;
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
-      border-bottom: 8px solid #fffbf0;
+      border-bottom: 8px solid #FFD93D;
       margin-bottom: -1px;
       filter: drop-shadow(0 -2px 4px rgba(0,0,0,0.18));
     }
@@ -1352,9 +1360,9 @@ void main(void){
     float sr=rnd(sc+vec2(13.7,5.2));
     vec2 so=vec2(rnd(sc*1.1+.3),rnd(sc*.9+1.7));
     float sd=length(sf-so);
-    float sb=(1.-smoothstep(0.,.11,sd))*step(.93,sr);
-    float stw=.44+.56*sin(T*(1.8+sr*3.0)+sr*6.28);
-    col+=sb*stw*vec3(.88,.93,1.00)*.88;
+    float sb=(1.-smoothstep(0.,.18,sd))*step(.91,sr);
+    float stw=.55+.65*sin(T*(1.8+sr*3.0)+sr*6.28);
+    col+=sb*stw*vec3(.90,.95,1.00)*1.55;
   }
 
   /* ── Star layer 2 — dense faint blue-white (Milky Way feel) ── */
@@ -1364,9 +1372,9 @@ void main(void){
     float sr=rnd(sc+vec2(7.3,2.9));
     vec2 so=vec2(rnd(sc*.8+1.2),rnd(sc*1.4+.6));
     float sd=length(sf-so);
-    float sb=(1.-smoothstep(0.,.20,sd))*step(.87,sr);
-    float stw=.55+.45*sin(T*(2.2+sr*2.5)+sr*6.28);
-    col+=sb*stw*vec3(.65,.80,1.00)*.32;
+    float sb=(1.-smoothstep(0.,.24,sd))*step(.85,sr);
+    float stw=.60+.55*sin(T*(2.2+sr*2.5)+sr*6.28);
+    col+=sb*stw*vec3(.70,.85,1.00)*.65;
   }
 
   /* ── Star layer 3 — gold-yellow giant stars (rare & bright) ── */
@@ -1376,21 +1384,25 @@ void main(void){
     float sr=rnd(sc+vec2(19.1,3.4));
     vec2 so=vec2(rnd(sc*1.5+2.1),rnd(sc*.7+3.4));
     float sd=length(sf-so);
-    float sb=(1.-smoothstep(0.,.07,sd))*step(.975,sr);
-    float stw=.58+.42*sin(T*(1.1+sr*4.0)+sr*6.28);
-    col+=sb*stw*vec3(1.00,.90,.38)*1.35;
+    float sb=(1.-smoothstep(0.,.13,sd))*step(.972,sr);
+    float stw=.65+.55*sin(T*(1.1+sr*4.0)+sr*6.28);
+    col+=sb*stw*vec3(1.00,.92,.42)*2.4;
+    /* Diffraction cross-spikes on gold giants */
+    float spkX=exp(-abs(sf.x-so.x)*28.)*step(.972,sr);
+    float spkY=exp(-abs(sf.y-so.y)*28.)*step(.972,sr);
+    col+=(spkX+spkY)*stw*vec3(1.00,.88,.30)*0.55;
   }
 
-  /* ── Star layer 4 — tiny red-orange rare stars ── */
+  /* ── Star layer 4 — red-orange rare stars ── */
   {
     vec2 st=uv*82.+vec2(-T*.004,T*.006);
     vec2 sc=floor(st),sf=fract(st);
     float sr=rnd(sc+vec2(3.1,11.7));
     vec2 so=vec2(rnd(sc*1.2+.8),rnd(sc*.6+2.2));
     float sd=length(sf-so);
-    float sb=(1.-smoothstep(0.,.09,sd))*step(.968,sr);
-    float stw=.50+.50*sin(T*(1.4+sr*3.6)+sr*6.28);
-    col+=sb*stw*vec3(1.00,.55,.25)*.70;
+    float sb=(1.-smoothstep(0.,.15,sd))*step(.962,sr);
+    float stw=.55+.60*sin(T*(1.4+sr*3.6)+sr*6.28);
+    col+=sb*stw*vec3(1.00,.58,.28)*1.25;
   }
 
   /* ── Vignette ── */
@@ -1470,13 +1482,22 @@ void main(void){
     })();
 
     /* ══════════════════════════════════════════════════════════════
-       Particle overlay
+       Particle overlay — interactive stars + waves + cursor trail
     ══════════════════════════════════════════════════════════════ */
     (function () {
       const pc = document.getElementById('particleCanvas');
       if (!pc) return;
       const ctx = pc.getContext('2d');
-      let W, H, particles;
+      let W, H, particles, trail = [];
+      let mouseX = -9999, mouseY = -9999, inHero = false;
+
+      window.addEventListener('mousemove', function (e) {
+        const rect = pc.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+        inHero = mouseX >= 0 && mouseX <= W && mouseY >= 0 && mouseY <= H;
+      });
+      window.addEventListener('mouseleave', function () { mouseX = -9999; mouseY = -9999; inHero = false; });
 
       function resize() {
         const dpr = Math.min(devicePixelRatio, 2);
@@ -1486,15 +1507,15 @@ void main(void){
       }
 
       function initParticles() {
-        particles = Array.from({ length: 68 }, () => ({
+        particles = Array.from({ length: 140 }, () => ({
           x:  Math.random() * W,
           y:  Math.random() * H,
-          r:  Math.random() * 1.6 + 0.3,
+          r:  Math.random() * 2.8 + 0.7,
           vx: (Math.random() - 0.5) * 0.14,
-          vy: -(Math.random() * 0.20 + 0.04),
+          vy: -(Math.random() * 0.18 + 0.03),
           phase: Math.random() * Math.PI * 2,
-          speed: Math.random() * 0.6 + 0.4,
-          gold:  Math.random() > 0.42,
+          speed: Math.random() * 0.6 + 0.3,
+          gold:  Math.random() > 0.38,
         }));
       }
 
@@ -1502,32 +1523,129 @@ void main(void){
       initParticles();
       window.addEventListener('resize', () => { resize(); initParticles(); });
 
-      let t0p = performance.now();
-      function drawParticles() {
-        const t = (performance.now() - t0p) * 0.001;
-        ctx.clearRect(0, 0, W, H);
-        for (const p of particles) {
-          const alpha = 0.12 + 0.52 * (Math.sin(t * p.speed + p.phase) * 0.5 + 0.5);
-          const a1 = alpha.toFixed(2);
-          const a2 = (alpha * 0.65).toFixed(2);
+      /* ── Wave definitions ───────────────────────────────── */
+      const WAVES = [
+        { amp: 24, freq: 0.0070, speed: 0.38, yFrac: 0.80, r: 201, g: 168, b: 76,  a: 0.16, w: 2.2, blur: 18 },
+        { amp: 18, freq: 0.0110, speed: 0.60, yFrac: 0.87, r: 224, g: 122, b: 58,  a: 0.12, w: 1.6, blur: 14 },
+        { amp: 32, freq: 0.0052, speed: 0.25, yFrac: 0.93, r:  74, g: 157, b: 181, a: 0.10, w: 1.8, blur: 16 },
+      ];
+
+      function drawWaves(t) {
+        ctx.save();
+        for (const w of WAVES) {
+          const baseY = H * w.yFrac;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          for (let x = 0; x <= W; x += 3) {
+            const y = baseY + Math.sin(x * w.freq + t * w.speed) * w.amp;
+            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.shadowBlur  = w.blur;
+          ctx.shadowColor = 'rgba(' + w.r + ',' + w.g + ',' + w.b + ',0.7)';
+          ctx.strokeStyle = 'rgba(' + w.r + ',' + w.g + ',' + w.b + ',' + w.a + ')';
+          ctx.lineWidth   = w.w;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      /* ── Cursor trail ───────────────────────────────────── */
+      function spawnTrail(x, y) {
+        for (let i = 0; i < 4; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const spd   = Math.random() * 1.4 + 0.4;
+          trail.push({
+            x, y,
+            vx: Math.cos(angle) * spd * 0.45,
+            vy: Math.sin(angle) * spd * 0.45 - 0.9,
+            r:    Math.random() * 3.8 + 1.2,
+            life: 1.0,
+            decay: Math.random() * 0.028 + 0.022,
+            gold: Math.random() > 0.35,
+          });
+        }
+      }
+
+      function drawTrail() {
+        for (let i = trail.length - 1; i >= 0; i--) {
+          const p = trail[i];
+          p.x  += p.vx; p.y += p.vy;
+          p.vy += 0.025;
+          p.vx *= 0.95; p.vy *= 0.95;
+          p.life -= p.decay;
+          if (p.life <= 0) { trail.splice(i, 1); continue; }
+          const alpha = p.life * p.life;
+          const drawR = p.r * p.life;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, Math.max(0.1, drawR), 0, Math.PI * 2);
           if (p.gold) {
-            ctx.shadowBlur = 10; ctx.shadowColor = '#C9A84C';
-            ctx.fillStyle = 'rgba(201,168,76,' + a1 + ')';
+            ctx.shadowBlur = 20; ctx.shadowColor = '#C9A84C';
+            ctx.fillStyle = 'rgba(201,168,76,' + alpha.toFixed(2) + ')';
           } else {
-            ctx.shadowBlur = 7; ctx.shadowColor = '#fff';
-            ctx.fillStyle = 'rgba(255,248,230,' + a2 + ')';
+            ctx.shadowBlur = 15; ctx.shadowColor = '#c8e0ff';
+            ctx.fillStyle = 'rgba(200,224,255,' + alpha.toFixed(2) + ')';
           }
           ctx.fill();
-          p.x += p.vx; p.y += p.vy;
-          if (p.y < -4)  p.y = H + 4;
-          if (p.x < -4)  p.x = W + 4;
-          if (p.x > W+4) p.x = -4;
         }
-        requestAnimationFrame(drawParticles);
       }
-      drawParticles();
+
+      /* ── Stars ──────────────────────────────────────────── */
+      const REPEL_R = 130;
+
+      function drawStars(t) {
+        for (const p of particles) {
+          const dx = p.x - mouseX, dy = p.y - mouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          let glow = 0;
+          if (dist < REPEL_R && dist > 0.5) {
+            const strength = (1 - dist / REPEL_R);
+            p.vx += (dx / dist) * strength * 0.18;
+            p.vy += (dy / dist) * strength * 0.18;
+            glow = strength;
+          }
+          p.vx *= 0.94; p.vy *= 0.94;
+          const pulse = Math.sin(t * p.speed + p.phase) * 0.5 + 0.5;
+          const alpha = Math.min(1.0, 0.28 + 0.68 * pulse + glow * 0.55);
+          const drawR = p.r + glow * p.r * 1.1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, drawR, 0, Math.PI * 2);
+          if (p.gold) {
+            ctx.shadowBlur = 26 + glow * 24; ctx.shadowColor = '#C9A84C';
+            ctx.fillStyle = 'rgba(201,168,76,' + alpha.toFixed(2) + ')';
+          } else {
+            ctx.shadowBlur = 18 + glow * 20; ctx.shadowColor = '#e8f0ff';
+            ctx.fillStyle = 'rgba(230,240,255,' + alpha.toFixed(2) + ')';
+          }
+          ctx.fill();
+          if (p.r > 2.0 && glow > 0.2) {
+            const spikeLen = drawR * 5 * glow;
+            const sa = (alpha * 0.5).toFixed(2);
+            ctx.strokeStyle = p.gold ? 'rgba(201,168,76,' + sa + ')' : 'rgba(200,220,255,' + sa + ')';
+            ctx.lineWidth = 0.8;
+            ctx.shadowBlur = 8; ctx.shadowColor = p.gold ? '#C9A84C' : '#aad4ff';
+            ctx.beginPath();
+            ctx.moveTo(p.x - spikeLen, p.y); ctx.lineTo(p.x + spikeLen, p.y);
+            ctx.moveTo(p.x, p.y - spikeLen); ctx.lineTo(p.x, p.y + spikeLen);
+            ctx.stroke();
+          }
+          p.x += p.vx; p.y += p.vy;
+          if (p.y < -6)  p.y = H + 6;
+          if (p.x < -6)  p.x = W + 6;
+          if (p.x > W+6) p.x = -6;
+        }
+      }
+
+      let t0p = performance.now();
+      function frame() {
+        const t = (performance.now() - t0p) * 0.001;
+        ctx.clearRect(0, 0, W, H);
+        ctx.shadowBlur = 0;
+        drawWaves(t);
+        drawStars(t);
+        if (inHero) spawnTrail(mouseX, mouseY);
+        drawTrail();
+        requestAnimationFrame(frame);
+      }
+      frame();
     })();
 
     /* ══════════════════════════════════════════════════════════════
