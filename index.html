@@ -363,26 +363,6 @@
     }
     .hc-center:hover .hc-shine { opacity: 1; }
 
-    /* ── Happy Smiley Clouds ───────────────────────────── */
-    @keyframes cloud-rtl-slow {
-      0%   { transform: translateX(120vw) translateY(0px); }
-      30%  { transform: translateX(80vw)  translateY(-16px); }
-      60%  { transform: translateX(38vw)  translateY(-4px); }
-      100% { transform: translateX(-38vw) translateY(0px); }
-    }
-    @keyframes cloud-ltr {
-      0%   { transform: translateX(-38vw) translateY(0px); }
-      35%  { transform: translateX(22vw)  translateY(-20px); }
-      70%  { transform: translateX(64vw)  translateY(-8px); }
-      100% { transform: translateX(120vw) translateY(0px); }
-    }
-    @keyframes cloud-rtl-fast {
-      0%   { transform: translateX(120vw) translateY(0px); }
-      45%  { transform: translateX(50vw)  translateY(-18px); }
-      100% { transform: translateX(-38vw) translateY(0px); }
-    }
-    .smiley-cloud { position: absolute; pointer-events: none; }
-
     /* ── 3D News Carousel ─────────────────────────────── */
     #c3dContainer {
       perspective: 900px;
@@ -767,75 +747,6 @@
 
     <!-- Subtle grain texture -->
     <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;opacity:0.32;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.68%22 numOctaves=%223%22 stitchTiles=%22stitch%22/><feColorMatrix type=%22saturate%22 values=%220%22/></filter><rect width=%22180%22 height=%22180%22 filter=%22url(%23n)%22 opacity=%220.035%22/></svg>');"></div>
-
-    <!-- ── Happy Smiley Clouds (3 total) ── -->
-    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:8;overflow:hidden;">
-
-      <!-- Cloud 1: Large, RTL slow, beaming smile -->
-      <div class="smiley-cloud" style="top:8%;animation:cloud-rtl-slow 58s linear infinite;animation-delay:-9s;">
-        <svg width="192" height="94" viewBox="0 0 192 94" xmlns="http://www.w3.org/2000/svg">
-          <!-- Smooth 3-bump cloud body (uniform bump sizes) -->
-          <g fill="rgba(255,252,244,0.44)" filter="url(#csf1)">
-            <circle cx="56"  cy="58" r="32"/>
-            <circle cx="96"  cy="46" r="40"/>
-            <circle cx="136" cy="58" r="32"/>
-            <rect x="26" y="62" width="140" height="30" rx="15"/>
-          </g>
-          <defs><filter id="csf1"><feGaussianBlur stdDeviation="1.2"/></filter></defs>
-          <!-- Face (no blur) -->
-          <ellipse cx="74"  cy="75" rx="11" ry="5.5" fill="rgba(255,120,80,0.22)"/>
-          <ellipse cx="118" cy="75" rx="11" ry="5.5" fill="rgba(255,120,80,0.22)"/>
-          <circle cx="82"  cy="68" r="5.5" fill="#1e110a"/>
-          <circle cx="84"  cy="66" r="1.8" fill="rgba(255,255,255,0.82)"/>
-          <circle cx="110" cy="68" r="5.5" fill="#1e110a"/>
-          <circle cx="112" cy="66" r="1.8" fill="rgba(255,255,255,0.82)"/>
-          <path d="M 76 78 Q 96 92 116 78" stroke="#1e110a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-        </svg>
-      </div>
-
-      <!-- Cloud 2: Medium, LTR, wink -->
-      <div class="smiley-cloud" style="top:22%;animation:cloud-ltr 44s linear infinite;animation-delay:-20s;">
-        <svg width="150" height="76" viewBox="0 0 150 76" xmlns="http://www.w3.org/2000/svg">
-          <g fill="rgba(255,252,244,0.42)" filter="url(#csf2)">
-            <circle cx="44"  cy="48" r="28"/>
-            <circle cx="75"  cy="36" r="34"/>
-            <circle cx="108" cy="48" r="28"/>
-            <rect x="18" y="52" width="116" height="22" rx="11"/>
-          </g>
-          <defs><filter id="csf2"><feGaussianBlur stdDeviation="1"/></filter></defs>
-          <ellipse cx="57"  cy="61" rx="9" ry="5" fill="rgba(255,120,80,0.19)"/>
-          <ellipse cx="93"  cy="61" rx="9" ry="5" fill="rgba(255,120,80,0.19)"/>
-          <!-- Left eye open -->
-          <circle cx="63" cy="56" r="4.5" fill="#1e110a"/>
-          <circle cx="65" cy="54" r="1.5" fill="rgba(255,255,255,0.82)"/>
-          <!-- Right eye wink (closed arc) -->
-          <path d="M 82 54 Q 88 60 94 54" stroke="#1e110a" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <!-- Smile -->
-          <path d="M 59 64 Q 75 74 91 64" stroke="#1e110a" stroke-width="3" fill="none" stroke-linecap="round"/>
-        </svg>
-      </div>
-
-      <!-- Cloud 3: Small, RTL fast, ^^ closed-eye bliss -->
-      <div class="smiley-cloud" style="top:5%;animation:cloud-rtl-fast 34s linear infinite;animation-delay:-6s;">
-        <svg width="114" height="62" viewBox="0 0 114 62" xmlns="http://www.w3.org/2000/svg">
-          <g fill="rgba(255,252,244,0.40)" filter="url(#csf3)">
-            <circle cx="34" cy="36" r="22"/>
-            <circle cx="57" cy="26" r="28"/>
-            <circle cx="80" cy="36" r="22"/>
-            <rect x="13" y="40" width="88" height="20" rx="10"/>
-          </g>
-          <defs><filter id="csf3"><feGaussianBlur stdDeviation="0.8"/></filter></defs>
-          <ellipse cx="44" cy="50" rx="8" ry="4" fill="rgba(255,120,80,0.17)"/>
-          <ellipse cx="70" cy="50" rx="8" ry="4" fill="rgba(255,120,80,0.17)"/>
-          <!-- ^^ happy closed eyes -->
-          <path d="M 42 45 Q 47 39 52 45" stroke="#1e110a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-          <path d="M 62 45 Q 67 39 72 45" stroke="#1e110a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-          <!-- Big smile -->
-          <path d="M 42 53 Q 57 63 72 53" stroke="#1e110a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        </svg>
-      </div>
-
-    </div><!-- end cloud layer -->
 
     <!-- Content layer — centered single column -->
     <div class="relative z-10 w-full flex flex-col items-center justify-center text-center" style="min-height:100vh;padding:120px 24px 80px;">
